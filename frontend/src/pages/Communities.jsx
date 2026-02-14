@@ -1,15 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaUsers, FaSearch, FaSpinner, FaArrowLeft, FaPaperPlane } from 'react-icons/fa';
-import { io } from 'socket.io-client';
 import * as communitiesApi from '../api/communities';
 import { useApp } from '../context/AppContext';
 
 const CommunityChat = ({ community, onBack }) => {
-    const { currentUser } = useApp();
+    const { currentUser, socket } = useApp();
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
-    const [socket, setSocket] = useState(null);
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -22,20 +20,19 @@ const CommunityChat = ({ community, onBack }) => {
 
     // Socket connection
     useEffect(() => {
-        const newSocket = io(import.meta.env.PROD ? window.location.origin : 'http://localhost:3000');
-        setSocket(newSocket);
+        if (!socket) return;
 
-        newSocket.emit('join-community', community.id);
+        socket.emit('join-community', community.id);
 
-        newSocket.on('new-community-message', (msg) => {
+        socket.on('new-community-message', (msg) => {
             setMessages(prev => [...prev, msg]);
         });
 
         return () => {
-            newSocket.emit('leave-community', community.id);
-            newSocket.disconnect();
+            socket.emit('leave-community', community.id);
+            socket.off('new-community-message');
         };
-    }, [community.id]);
+    }, [community.id, socket]);
 
     // Fetch initial messages
     useEffect(() => {

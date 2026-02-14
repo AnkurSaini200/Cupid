@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import * as authApi from '../api/auth';
+import { io } from 'socket.io-client';
 
 const AppContext = createContext();
 
@@ -85,6 +86,21 @@ export const AppProvider = ({ children }) => {
     const [matches, setMatches] = useState([]);
     const [notifications, setNotifications] = useState(3);
     const [theme, setTheme] = useState('light');
+    const [socket, setSocket] = useState(null);
+
+    // Initialize Socket
+    useEffect(() => {
+        if (isAuthenticated && currentUser) {
+            const newSocket = io(import.meta.env.PROD ? window.location.origin : 'http://localhost:3000');
+            setSocket(newSocket);
+
+            newSocket.emit('user-online', currentUser.id);
+
+            return () => {
+                newSocket.disconnect();
+            };
+        }
+    }, [isAuthenticated, currentUser]);
 
     const addMatch = (user) => {
         setMatches(prev => [...prev, user]);
@@ -116,7 +132,8 @@ export const AppProvider = ({ children }) => {
         incrementNotifications,
         clearNotifications,
         theme,
-        toggleTheme
+        toggleTheme,
+        socket
     };
 
     return (

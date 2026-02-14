@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cupid - Project Navigator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .card h2 {
+            color: #6C5CE7;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .card p {
+            color: #636E72;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #6C5CE7;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #5f4fd1;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #A29BFE;
+        }
+
+        .btn-secondary:hover {
+            background: #8983f0;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            color: #2D3436;
+        }
+
+        .feature-list li:before {
+            content: "✓ ";
+            color: #00B894;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Cupid</h1>
+            <p>Your Complete Friend-Making Platform</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-icon">🚀</div>
+                <h2>Quick Start</h2>
+                <p>Get started in seconds! Open the main application or read the setup guide.</p>
+                <a href="frontend/index.html" class="btn">Launch App</a>
+                <a href="QUICK_SETUP.md" class="btn btn-secondary" style="margin-left: 10px;">Setup Guide</a>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📚</div>
+                <h2>Documentation</h2>
+                <p>Complete documentation including features, API, and architecture.</p>
+                <a href="README.md" class="btn">Read Docs</a>
+                <a href="PROJECT_STRUCTURE.md" class="btn btn-secondary" style="margin-left: 10px;">Structure</a>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">💻</div>
+                <h2>Backend API</h2>
+                <p>RESTful API with Socket.IO for real-time features.</p>
+                <a href="backend/server.js" class="btn">View Server</a>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 20px;">
+            <h2>✨ Features Included</h2>
+            <div style="columns: 2; column-gap: 30px;">
+                <ul class="feature-list">
+                    <li>Swipe-based profile discovery</li>
+                    <li>Real-time chat messaging</li>
+                    <li>Video & voice calls</li>
+                    <li>HMU (Explore) posts</li>
+                    <li>Interest communities</li>
+                    <li>User profiles & photos</li>
+                    <li>Match notification system</li>
+                    <li>Location-based filtering</li>
+                    <li>Social media integration</li>
+                    <li>Responsive design</li>
+                    <li>Modern UI animations</li>
+                    <li>Complete backend API</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📂 Project Organization</h2>
+            <p
+                style="font-family: monospace; background: #f8f9fa; padding: 20px; border-radius: 8px; overflow-x: auto;">
+                befriend-website/<br>
+                ├── <strong>frontend/</strong> (HTML, CSS, JS)<br>
+                │ ├── index.html ⭐ <em>Start here!</em><br>
+                │ ├── css/style.css<br>
+                │ └── js/app.js<br>
+                ├── <strong>backend/</strong> (Node.js server)<br>
+                │ ├── server.js<br>
+                │ └── routes/ (API endpoints)<br>
+                ├── <strong>database/</strong> (DB models)<br>
+                └── <strong>Documentation</strong> (README, guides)
+            </p>
+        </div>
+
+        <div class="footer">
+            <h3>🎯 Ready to Build?</h3>
+            <p style="margin: 20px 0;">All files are organized, documented, and ready to use!</p>
+            <p>Choose an option above to get started 🚀</p>
+        </div>
+    </div>
+</body>
+
+</html>

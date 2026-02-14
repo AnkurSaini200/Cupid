@@ -16,13 +16,15 @@ const Discover = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        loadUsers();
-    }, []);
+        if (currentUser) {
+            loadUsers();
+        }
+    }, [currentUser]);
 
     const loadUsers = async () => {
         try {
             setIsLoading(true);
-            const data = await usersApi.getNearbyUsers();
+            const data = await usersApi.getNearbyUsers({ userId: currentUser.id });
             setUsers(data.data || []);
             setIsLoading(false);
         } catch (err) {

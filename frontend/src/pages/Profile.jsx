@@ -5,6 +5,7 @@ import { FaMapMarkerAlt, FaEdit, FaInstagram, FaSnapchat, FaTiktok, FaDiscord, F
 
 import { useApp } from '../context/AppContext';
 import { getCommunities } from '../api/communities';
+import client from '../api/client';
 
 const Profile = () => {
     const { currentUser, setCurrentUser, logout } = useApp();
@@ -52,33 +53,23 @@ const Profile = () => {
     const handleSaveProfile = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem('token');
-
             // interests is already an array in editForm now
             const interestsArray = editForm.interests;
 
-            const res = await fetch(`http://localhost:3000/api/users/${currentUser.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    ...editForm,
-                    interests: interestsArray
-                })
+            const res = await client.put(`/users/${currentUser.id}`, {
+                ...editForm,
+                interests: interestsArray
             });
-            const data = await res.json();
 
-            if (data.success) {
-                setCurrentUser({ ...currentUser, ...data.data });
+            if (res.data.success) {
+                setCurrentUser({ ...currentUser, ...res.data.data });
                 setIsEditing(false);
             } else {
-                alert('Update failed: ' + data.message);
+                alert('Update failed: ' + res.data.message);
             }
         } catch (err) {
             console.error(err);
-            alert('Update failed');
+            alert('Update failed: ' + (err.response?.data?.message || err.message));
         }
     };
 
@@ -91,32 +82,18 @@ const Profile = () => {
         formData.append('photo', file);
 
         try {
-            const token = localStorage.getItem('token');
-
             // 1. Upload Photo
-            const uploadRes = await fetch(`http://localhost:3000/api/users/${currentUser.id}/photos`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
-                body: formData
-            });
-            const uploadData = await uploadRes.json();
+            // Axios automatically sets Content-Type to multipart/form-data when body is FormData
+            const uploadRes = await client.post(`/users/${currentUser.id}/photos`, formData);
 
-            if (!uploadData.success) throw new Error(uploadData.error || uploadData.message);
+            if (!uploadRes.data.success) throw new Error(uploadRes.data.error || uploadRes.data.message);
 
-            const photoUrl = uploadData.data.photoUrl;
+            const photoUrl = uploadRes.data.data.photoUrl;
 
             // 2. Update Avatar
-            const updateRes = await fetch(`http://localhost:3000/api/users/${currentUser.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ avatar: photoUrl })
-            });
-            const updateData = await updateRes.json();
+            const updateRes = await client.put(`/users/${currentUser.id}`, { avatar: photoUrl });
 
-            if (updateData.success) {
+            if (updateRes.data.success) {
                 const updatedUser = {
                     ...currentUser,
                     avatar: photoUrl,
@@ -124,12 +101,12 @@ const Profile = () => {
                 };
                 setCurrentUser(updatedUser);
             } else {
-                throw new Error(updateData.message);
+                throw new Error(updateRes.data.message);
             }
 
         } catch (err) {
             console.error(err);
-            alert('Avatar update failed: ' + err.message);
+            alert('Avatar update failed: ' + (err.response?.data?.message || err.message));
         } finally {
             setUploading(false);
             if (avatarInputRef.current) avatarInputRef.current.value = '';
@@ -140,30 +117,23 @@ const Profile = () => {
         if (!window.confirm('Are you sure you want to delete this photo?')) return;
 
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`http://localhost:3000/api/users/${currentUser.id}/photos`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ photoUrl })
+            const res = await client.delete(`/users/${currentUser.id}/photos`, {
+                data: { photoUrl }
             });
-            const data = await res.json();
 
-            if (data.success) {
+            if (res.data.success) {
                 const updatedUser = {
                     ...currentUser,
                     photos: currentUser.photos.filter(p => p !== photoUrl),
-                    avatar: data.data.avatar // Update avatar in case it was the deleted photo
+                    avatar: res.data.data.avatar // Update avatar in case it was the deleted photo
                 };
                 setCurrentUser(updatedUser);
             } else {
-                alert('Delete failed: ' + data.message);
+                alert('Delete failed: ' + res.data.message);
             }
         } catch (err) {
             console.error(err);
-            alert('Delete failed');
+            alert('Delete failed: ' + (err.response?.data?.message || err.message));
         }
     };
 
@@ -176,29 +146,21 @@ const Profile = () => {
         formData.append('photo', file);
 
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`http://localhost:3000/api/users/${currentUser.id}/photos`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
-            const data = await res.json();
+            const res = await client.post(`/users/${currentUser.id}/photos`, formData);
 
-            if (data.success) {
+            if (res.data.success) {
                 // Update context
                 const updatedUser = {
                     ...currentUser,
-                    photos: [...(currentUser.photos || []), data.data.photoUrl]
+                    photos: [...(currentUser.photos || []), res.data.data.photoUrl]
                 };
                 setCurrentUser(updatedUser);
             } else {
-                alert('Upload failed: ' + (data.error || data.message));
+                alert('Upload failed: ' + (res.data.error || res.data.message));
             }
         } catch (err) {
             console.error(err);
-            alert('Upload failed. Please check your connection.');
+            alert('Upload failed: ' + (err.response?.data?.message || err.message));
         } finally {
             setUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = '';

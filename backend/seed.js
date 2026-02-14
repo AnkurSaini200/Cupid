@@ -76,7 +76,7 @@ const communities = [
 
 const seedDatabase = async () => {
     try {
-        await mongoose.connect('mongodb://localhost:27017/Cupid', mongooseOptions);
+        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/Cupid', mongooseOptions);
         console.log('Connected to MongoDB');
 
         // Clear existing data

@@ -22,7 +22,7 @@ const CommunityChat = ({ community, onBack }) => {
 
     // Socket connection
     useEffect(() => {
-        const newSocket = io('http://localhost:3000');
+        const newSocket = io(import.meta.env.PROD ? window.location.origin : 'http://localhost:3000');
         setSocket(newSocket);
 
         newSocket.emit('join-community', community.id);
@@ -122,8 +122,8 @@ const CommunityChat = ({ community, onBack }) => {
 
                                 <div
                                     className={`max-w-[70%] px-4 py-2 rounded-2xl shadow-sm ${isMe
-                                            ? 'bg-primary-500 text-white rounded-br-none'
-                                            : 'bg-white text-gray-800 rounded-bl-none border border-gray-100'
+                                        ? 'bg-primary-500 text-white rounded-br-none'
+                                        : 'bg-white text-gray-800 rounded-bl-none border border-gray-100'
                                         }`}
                                 >
                                     {!isMe && showAvatar && (

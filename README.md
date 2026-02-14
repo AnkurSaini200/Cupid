@@ -171,6 +171,6 @@ MIT
 
 ---
 
-**Built with ❤️ using React, Tailwind CSS, and Framer Motion**
+**Built with ❤️ by mihir**
 
 🎉 Ready to make friends!

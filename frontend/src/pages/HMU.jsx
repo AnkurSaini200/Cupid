@@ -133,6 +133,20 @@ const HMU = () => {
         }
     };
 
+    const handleDeletePost = async (e, postId) => {
+        e.stopPropagation(); // Prevent opening chat
+        if (!window.confirm("Are you sure you want to delete this activity?")) return;
+
+        try {
+            await hmuApi.deletePost(postId);
+            setPosts(posts.filter(p => p.id !== postId));
+            if (selectedPost?.id === postId) setSelectedPost(null);
+        } catch (error) {
+            console.error("Failed to delete post:", error);
+            alert("Failed to delete post.");
+        }
+    };
+
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-[600px]">
@@ -178,8 +192,19 @@ const HMU = () => {
                             transition={{ delay: index * 0.1 }}
                             whileHover={{ y: -4 }}
                             onClick={() => handleOpenChat(post)}
-                            className="glass-white rounded-2xl p-6 cursor-pointer card-hover"
+                            className="glass-white rounded-2xl p-6 cursor-pointer card-hover relative group"
                         >
+                            {/* Delete Button (Only for creator) */}
+                            {currentUser && post.userId === currentUser.id && (
+                                <button
+                                    onClick={(e) => handleDeletePost(e, post.id)}
+                                    className="absolute top-4 right-4 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors opacity-0 group-hover:opacity-100"
+                                    title="Delete Activity"
+                                >
+                                    <FaTimes />
+                                </button>
+                            )}
+
                             {/* Post Header */}
                             <div className="flex items-start space-x-4 mb-4">
                                 <img
@@ -346,8 +371,8 @@ const HMU = () => {
                                                 />
                                             )}
                                             <div className={`p-3 rounded-2xl shadow-sm max-w-[70%] ${isMe
-                                                    ? 'bg-primary-500 text-white rounded-tr-none'
-                                                    : 'bg-white border border-gray-100 rounded-tl-none'
+                                                ? 'bg-primary-500 text-white rounded-tr-none'
+                                                : 'bg-white border border-gray-100 rounded-tl-none'
                                                 }`}>
                                                 {!isMe && <p className="font-bold text-xs text-primary-600 mb-1">{msg.userName}</p>}
                                                 <p className={isMe ? 'text-white' : 'text-gray-800'}>{msg.message}</p>

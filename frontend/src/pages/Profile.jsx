@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaMapMarkerAlt, FaEdit, FaInstagram, FaSnapchat, FaTiktok, FaDiscord, FaCamera, FaTrash, FaSignOutAlt } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaEdit, FaInstagram, FaSnapchat, FaDiscord, FaCamera, FaTrash, FaSignOutAlt } from 'react-icons/fa';
 
 import { useApp } from '../context/AppContext';
 import { getCommunities } from '../api/communities';
@@ -291,7 +291,6 @@ const Profile = () => {
                     {[
                         { icon: FaInstagram, name: 'Instagram', key: 'instagram', color: 'from-pink-500 to-purple-500' },
                         { icon: FaSnapchat, name: 'Snapchat', key: 'snapchat', color: 'from-yellow-400 to-yellow-500' },
-                        { icon: FaTiktok, name: 'TikTok', key: 'tiktok', color: 'from-gray-800 to-gray-900' },
                         { icon: FaDiscord, name: 'Discord', key: 'discord', color: 'from-indigo-500 to-indigo-600' }
                     ].map((social, index) => {
                         const link = user.socials?.[social.key];
@@ -476,7 +475,7 @@ const Profile = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Social Handles</label>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {['instagram', 'snapchat', 'tiktok', 'discord'].map(platform => (
+                                        {['instagram', 'snapchat', 'discord'].map(platform => (
                                             <div key={platform} className="flex items-center space-x-2">
                                                 <span className="capitalize w-20 text-sm text-gray-500">{platform}</span>
                                                 <input

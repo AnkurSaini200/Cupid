@@ -102,15 +102,55 @@ router.post('/create', async (req, res) => {
     }
 });
 
-// Respond to HMU post
+// Get single HMU post (for Chat)
+router.get('/:postId', async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const post = await HMUPost.findById(postId)
+            .populate('userId', 'name avatar')
+            .populate('responses.userId', 'name avatar');
+
+        if (!post) return res.status(404).json({ message: 'Post not found' });
+
+        res.json({
+            success: true,
+            data: {
+                id: post._id,
+                userId: post.userId._id,
+                userName: post.userId.name,
+                userAvatar: post.userId.avatar,
+                activity: post.activity,
+                activityEmoji: getActivityEmoji(post.activity),
+                text: post.text,
+                time: post.createdAt,
+                location: post.location,
+                responses: post.responses.map(r => ({
+                    id: r._id,
+                    userId: r.userId._id,
+                    userName: r.userId.name,
+                    userAvatar: r.userId.avatar,
+                    message: r.message,
+                    time: r.createdAt
+                }))
+            }
+        });
+    } catch (error) {
+        console.error('Get HMU post error:', error);
+        res.status(500).json({ message: 'Failed to fetch post' });
+    }
+});
+
+// Respond to HMU post (Chat Message)
 router.post('/:postId/respond', async (req, res) => {
     try {
         const { postId } = req.params;
         const { userId, message } = req.body;
+        const io = req.app.get('io');
 
         const post = await HMUPost.findById(postId);
         if (!post) return res.status(404).json({ message: 'Post not found' });
 
+        // Add response
         post.responses.push({
             userId,
             message: message || "I'm interested!",
@@ -119,12 +159,34 @@ router.post('/:postId/respond', async (req, res) => {
 
         await post.save();
 
+        // Get the newly added response
+        const newResponse = post.responses[post.responses.length - 1];
+
+        // Populate user details for socket emit
+        const user = await User.findById(userId).select('name avatar');
+
+        const responseData = {
+            id: newResponse._id,
+            userId: user._id,
+            userName: user.name,
+            userAvatar: user.avatar,
+            message: newResponse.message,
+            time: newResponse.createdAt
+        };
+
+        // Emit to room
+        if (io) {
+            io.to(`hmu_${postId}`).emit('hmu-new-response', responseData);
+        }
+
         res.status(201).json({
             success: true,
-            message: 'Response sent'
+            message: 'Response sent',
+            data: responseData
         });
 
     } catch (error) {
+        console.error('HMU respond error:', error);
         res.status(500).json({ message: 'Failed to respond' });
     }
 });

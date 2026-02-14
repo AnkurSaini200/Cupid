@@ -146,6 +146,16 @@ io.on('connection', (socket) => {
         socket.leave(`community_${communityId}`);
     });
 
+    // HMU Post Chat
+    socket.on('join-hmu', (postId) => {
+        socket.join(`hmu_${postId}`);
+        console.log(`User ${socket.id} joined HMU post ${postId}`);
+    });
+
+    socket.on('leave-hmu', (postId) => {
+        socket.leave(`hmu_${postId}`);
+    });
+
     // User disconnects
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);

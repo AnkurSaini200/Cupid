@@ -5,6 +5,11 @@ export const getFeed = async () => {
     return response.data;
 };
 
+export const getPost = async (postId) => {
+    const response = await client.get(`/hmu/${postId}`);
+    return response.data;
+};
+
 export const createPost = async (postData) => {
     const response = await client.post('/hmu/create', postData);
     return response.data;

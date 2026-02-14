@@ -181,7 +181,7 @@ const Messages = () => {
                             <div className="flex space-x-4">
                                 {matches.map((match) => (
                                     <div
-                                        key={match.matchId}
+                                        key={match.user.id}
                                         onClick={() => startConversationWithMatch(match)}
                                         className="flex flex-col items-center flex-shrink-0 cursor-pointer group"
                                     >
@@ -213,7 +213,7 @@ const Messages = () => {
                         ) : (
                             conversations.map((conv) => (
                                 <motion.div
-                                    key={conv.id}
+                                    key={conv.id || conv.userId}
                                     whileHover={{ backgroundColor: '#f9fafb' }}
                                     onClick={() => selectConversation(conv)}
                                     className={`p-4 cursor-pointer border-l-4 transition-all ${selectedConversation?.id === conv.id
@@ -239,7 +239,7 @@ const Messages = () => {
                                                     {conv.userName}
                                                 </h3>
                                                 <span className="text-xs text-gray-500">
-                                                    {new Date(conv.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    {conv.updatedAt ? new Date(conv.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                                                 </span>
                                             </div>
                                             <p className="text-sm text-gray-600 truncate">{conv.lastMessage?.text || 'Start chatting!'}</p>

@@ -17,11 +17,18 @@ router.get('/conversations/:userId', async (req, res) => {
             .sort({ updatedAt: -1 });
 
         // Transform for frontend
-        const userConversations = conversations.map(conv => {
+        const userConversations = await Promise.all(conversations.map(async conv => {
             const otherUser = conv.participants.find(p => p._id.toString() !== userId);
 
             // If other user deleted/null, handle gracefully
             if (!otherUser) return null;
+
+            // Count unread messages
+            const unreadCount = await Message.countDocuments({
+                conversationId: conv._id,
+                recipientId: userId,
+                read: false
+            });
 
             return {
                 id: conv._id,
@@ -34,14 +41,16 @@ router.get('/conversations/:userId', async (req, res) => {
                     timestamp: conv.lastMessage.createdAt,
                     senderId: conv.lastMessage.senderId
                 } : null,
-                unreadCount: 0 // active reading logic requires aggregating unread msgs
+                unreadCount: unreadCount
             };
-        }).filter(Boolean);
+        }));
+
+        const validConversations = userConversations.filter(Boolean);
 
         res.json({
             success: true,
-            data: userConversations,
-            count: userConversations.length
+            data: validConversations,
+            count: validConversations.length
         });
 
     } catch (error) {
@@ -125,6 +134,20 @@ router.post('/send', async (req, res) => {
             lastMessage: newMessage._id,
             updatedAt: new Date()
         });
+
+        // Emit to recipient's room for real-time update
+        const io = req.app.get('io');
+        if (io) {
+            io.to(`user:${recipientId}`).emit('new-message', {
+                id: newMessage._id,
+                conversationId: targetConversationId,
+                senderId,
+                recipientId,
+                text: newMessage.text,
+                timestamp: newMessage.createdAt,
+                read: false
+            });
+        }
 
         res.status(201).json({
             success: true,

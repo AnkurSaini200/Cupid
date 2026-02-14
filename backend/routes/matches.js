@@ -86,10 +86,21 @@ router.get('/:userId', async (req, res) => {
             };
         }).filter(Boolean);
 
+        // Deduplicate by user ID
+        const uniqueMatches = [];
+        const seenUserIds = new Set();
+
+        userMatches.forEach(match => {
+            if (!seenUserIds.has(match.user.id.toString())) {
+                seenUserIds.add(match.user.id.toString());
+                uniqueMatches.push(match);
+            }
+        });
+
         res.json({
             success: true,
-            data: userMatches,
-            count: userMatches.length
+            data: uniqueMatches,
+            count: uniqueMatches.length
         });
 
     } catch (error) {

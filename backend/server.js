@@ -63,26 +63,27 @@ io.on('connection', (socket) => {
     socket.on('user-online', (userId) => {
         connectedUsers.set(userId, socket.id);
         socket.userId = userId;
+        socket.join(`user:${userId}`); // Join personal room
 
         // Broadcast online status to friends
         socket.broadcast.emit('user-status-change', {
             userId: userId,
             status: 'online'
         });
+
+        console.log(`User ${userId} came online and joined room user:${userId}`);
     });
 
     // Handle private messages
     socket.on('private-message', (data) => {
         const { recipientId, message } = data;
-        const recipientSocketId = connectedUsers.get(recipientId);
 
-        if (recipientSocketId) {
-            io.to(recipientSocketId).emit('new-message', {
-                senderId: socket.userId,
-                message: message,
-                timestamp: new Date()
-            });
-        }
+        // Emit to recipient's room
+        io.to(`user:${recipientId}`).emit('new-message', {
+            senderId: socket.userId,
+            message: message,
+            timestamp: new Date()
+        });
 
         // Save to database (in real app)
         console.log('Message from', socket.userId, 'to', recipientId);
